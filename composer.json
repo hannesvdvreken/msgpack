@@ -1,0 +1,24 @@
+{
+  "name": "hannesvdvreken/msgpack",
+  "description": "Msgpack implementation for PHP. It's like JSON. But fast and small.",
+  "keywords": [
+    "msgpack",
+    "json",
+    "fast",
+    "small"
+  ],
+  "license": "MIT",
+  "type": "library",
+  "require": {
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Msgpack\\": "src"
+    }
+  },
+  "scripts": {
+    "test": "echo 'No tests for now, sorry!'"
+  }
+}
