@@ -18,15 +18,18 @@ For more information on Msgpack: [msgpack.org](http://msgpack.org/)
 There are 2 main classes with basic static methods to use:
 
 ```php
-    $string = Msgpack\Encoder::encode($data);
-    $data = Msgpack\Decoder::decode($string);
+    $encoder = new Msgpack\Encoder;
+    $string = $encoder->encode($data);
+
+    $decoder = new Msgpack\Decoder;
+    $data = $decoder->decode($string);
 ```
 
 Some messages or encoded string throw exceptions because Msgpack has its limitations:
 
 ```php
     try {
-        $string = Msgpack\Encoder::encode($data);
+        $string = $encoder->encode($data);
     } catch (Msgpack\EnencodeableException $unencex) {
         //
     }
@@ -34,7 +37,7 @@ Some messages or encoded string throw exceptions because Msgpack has its limitat
 
 ```php
     try {
-        $string = Msgpack\Decoder::decode($string);
+        $string = $decoder->decode($string);
     } catch (Msgpack\EndecodeableException $undecex) {
         //
     }
