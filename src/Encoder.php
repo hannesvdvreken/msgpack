@@ -50,7 +50,7 @@ class Encoder
     private function encodeArray(array $array)
     {
         // If it is an associative array, treat it as an object.
-        if (array_keys($array) !== range(0, count($array) - 1)) {
+        if (!empty($array) && array_keys($array) !== range(0, count($array) - 1)) {
             return $this->encodeMap($array);
         }
 
@@ -177,7 +177,7 @@ class Encoder
             if ($integer < pow(2, 7)) {
                 // positive fixnum: 7-bit positive integer
                 // 0XXXXXXX
-                return pack('H*', dechex($integer));
+                return pack('H*', str_pad(dechex($integer), 2, 0, STR_PAD_LEFT));
             } elseif ($integer < pow(2, 8)) {
                 // uint 8: 8-bit unsigned integer
                 // 0xcc ZZZZZZZZ
