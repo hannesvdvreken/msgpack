@@ -2,8 +2,8 @@
 
 ## What is Msgpack?
 
-It's like JSON.
-but fast and small.
+If you ever wished to use JSON for convenience (storing an image with metadata)
+but could not for technical reasons (encoding, size, speed...), MessagePack is a perfect replacement.
 
 MessagePack is an efficient binary serialization format.
 It lets you exchange data among multiple languages like JSON.
