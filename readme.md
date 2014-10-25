@@ -30,7 +30,7 @@ Some messages or encoded string throw exceptions because Msgpack has its limitat
 ```php
     try {
         $string = $encoder->encode($data);
-    } catch (Msgpack\EnencodeableException $unencex) {
+    } catch (Msgpack\UnencodeableException $unencex) {
         //
     }
 ```
@@ -38,7 +38,7 @@ Some messages or encoded string throw exceptions because Msgpack has its limitat
 ```php
     try {
         $string = $decoder->decode($string);
-    } catch (Msgpack\EndecodeableException $undecex) {
+    } catch (Msgpack\UndecodeableException $undecex) {
         //
     }
 ```
