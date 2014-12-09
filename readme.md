@@ -1,4 +1,6 @@
 # [Msgpack](http://msgpack.org/) implementation for Modern PHP
+[![Build Status](http://img.shields.io/travis/hannesvdvreken/msgpack.svg?style=flat-square)](https://travis-ci.org/hannesvdvreken/msgpack)
+[![License](http://img.shields.io/packagist/l/hannesvdvreken/msgpack.svg?style=flat-square)](#license)
 
 ## What is Msgpack?
 
