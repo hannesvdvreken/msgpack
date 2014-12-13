@@ -19,6 +19,6 @@
     }
   },
   "scripts": {
-    "test": "echo 'No tests for now, sorry!'"
+    "test": "phpunit"
   }
 }
