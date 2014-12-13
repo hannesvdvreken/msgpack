@@ -4,34 +4,50 @@ namespace Msgpack;
 class Encoder
 {
     /**
-     * @param $data
+     * @param string $name
+     * @param array  $arguments
      *
      * @return string
+     */
+    public function __call($name, $arguments)
+    {
+        if ($name != 'encode') {
+            throw new \BadMethodCallException;
+        }
+
+        return self::encode($arguments[0]);
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return string
+     * @throws Exception
      * @throws UnencodeableException
      */
-    public function encode($data)
+    public static function encode($data)
     {
         switch (gettype($data)) {
             case 'array':
-                return $this->encodeArray($data);
+                return self::encodeArray($data);
                 break;
             case 'object':
-                return $this->encodeObject($data);
+                return self::encodeObject($data);
                 break;
             case 'string':
-                return $this->encodeString($data);
+                return self::encodeString($data);
                 break;
             case 'integer':
-                return $this->encodeInteger($data);
+                return self::encodeInteger($data);
                 break;
             case 'boolean':
-                return $this->encodeBoolean($data);
+                return self::encodeBoolean($data);
                 break;
             case 'double':
-                return $this->encodeDouble($data);
+                return self::encodeDouble($data);
                 break;
             case 'NULL':
-                return $this->encodeNull($data);
+                return self::encodeNull($data);
                 break;
             case 'resource':
                 // TODO
@@ -47,11 +63,11 @@ class Encoder
      * @return string
      * @throws UnencodeableException
      */
-    private function encodeArray(array $array)
+    private static function encodeArray(array $array)
     {
         // If it is an associative array, treat it as an object.
         if (!empty($array) && array_keys($array) !== range(0, count($array) - 1)) {
-            return $this->encodeMap($array);
+            return self::encodeMap($array);
         }
 
         // Differentiate on the array length.
@@ -76,7 +92,7 @@ class Encoder
         // Loop every item of the array.
         foreach (array_values($array) as $item) {
             // Concatenate everything.
-            $result .= $this->encode($item);
+            $result .= self::encode($item);
         }
 
         // Return the result.
@@ -88,10 +104,10 @@ class Encoder
      *
      * @return string
      */
-    private function encodeObject($object)
+    private static function encodeObject($object)
     {
         // Convert to associative array and encode that.
-        return $this->encodeMap(get_object_vars($object));
+        return self::encodeMap(get_object_vars($object));
     }
 
     /**
@@ -100,7 +116,7 @@ class Encoder
      * @return string
      * @throws UnencodeableException
      */
-    private function encodeMap(array $array)
+    private static function encodeMap(array $array)
     {
         // Differentiate on the map length.
         if (count($array) < 16) {
@@ -125,8 +141,8 @@ class Encoder
         // Loop every item of the array.
         foreach ($array as $key => $value) {
             // Both encode and append the key and the value.
-            $result .= $this->encode($key);
-            $result .= $this->encode($value);
+            $result .= self::encode($key);
+            $result .= self::encode($value);
         }
 
         // Return the result.
@@ -139,7 +155,7 @@ class Encoder
      * @return string
      * @throws UnencodeableException
      */
-    private function encodeString($string)
+    private static function encodeString($string)
     {
         // Note:
         // strlen() returns the number of bytes rather than the number of characters in a string.
@@ -170,7 +186,7 @@ class Encoder
      *
      * @return string
      */
-    private function encodeInteger($integer)
+    private static function encodeInteger($integer)
     {
         if ($integer >= 0) {
             // All positive integers.
@@ -228,7 +244,7 @@ class Encoder
      *
      * @throws Exception
      */
-    private function encodeDouble($data)
+    private static function encodeDouble($data)
     {
         throw new Exception('Not implemented');
     }
@@ -238,7 +254,7 @@ class Encoder
      *
      * @return string
      */
-    private function encodeBoolean($boolean)
+    private static function encodeBoolean($boolean)
     {
         if ($boolean) {
             $value = 0xc3;
@@ -254,7 +270,7 @@ class Encoder
      *
      * @return string
      */
-    private function encodeNull($data)
+    private static function encodeNull($data)
     {
         return pack('H*', dechex(0xc0));
     }

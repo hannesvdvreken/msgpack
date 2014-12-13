@@ -6,15 +6,30 @@ use stdClass;
 class Decoder
 {
     /**
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if ($name != 'decode') {
+            throw new \BadMethodCallException;
+        }
+
+        return self::decode($arguments[0], $arguments[1]);
+    }
+
+    /**
      * @param string $string
      * @param bool   $assoc
      *
      * @throws UndecodeableException
      * @return mixed
      */
-    public function decode($string, $assoc = true)
+    public static function decode($string, $assoc = true)
     {
-        return $this->decodeRecursive($string, $assoc)[0];
+        return self::decodeRecursive($string, $assoc)[0];
     }
 
     /**
@@ -26,18 +41,18 @@ class Decoder
      */
     public function decodeRecursive($string, $assoc = false)
     {
-        list($firstHex, $firstOctal) = $this->analyzeFirstChar($string[0]);
+        list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         switch (true) {
             case $firstOctal === '8': // fixmap 1000xxxx
             case $firstHex === 'de': // map 16
             case $firstHex === 'df': // map 32
-                return $this->decodeMap($string, $assoc);
+                return self::decodeMap($string, $assoc);
                 break;
             case $firstOctal === '9': // fixarray 1001xxxx
             case $firstHex === 'dc': // array 16
             case $firstHex === 'dd': // array 32
-                return $this->decodeArray($string, $assoc);
+                return self::decodeArray($string, $assoc);
                 break;
             case hexdec($firstHex) < pow(2, 7): // fixint 0xxxxxxx
             case hexdec($firstOctal) > 13: // negative fixint 111xxxxx
@@ -49,13 +64,13 @@ class Decoder
             case $firstHex === 'd1': // int 16
             case $firstHex === 'd2': // int 32
             case $firstHex === 'd3': // int 64
-                return $this->decodeInt($string);
+                return self::decodeInt($string);
                 break;
             case in_array(hexdec($firstOctal), [10, 11]): // fixstr 101xxxxx
             case $firstHex === 'd9': // str 8
             case $firstHex === 'da': // str 16
             case $firstHex === 'db': // str 32
-                return $this->decodeString($string);
+                return self::decodeString($string);
                 break;
             case $firstHex === 'c2': // false
                 return [false, substr($string, 1)];
@@ -75,9 +90,9 @@ class Decoder
      * @return array|stdClass
      * @throws UndecodeableException
      */
-    private function decodeMap($string, $assoc)
+    private static function decodeMap($string, $assoc)
     {
-        list($firstHex, $firstOctal) = $this->analyzeFirstChar($string[0]);
+        list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         if ($firstOctal === '8') {
             // fixmap 1000xxxx
@@ -111,8 +126,8 @@ class Decoder
 
         // Recursively decode everything in this hashmap.
         for ($i = 0; $i < $size; $i++) {
-            list($key, $string) = $this->decodeRecursive($string, $assoc);
-            list($value, $string) = $this->decodeRecursive($string, $assoc);
+            list($key, $string) = self::decodeRecursive($string, $assoc);
+            list($value, $string) = self::decodeRecursive($string, $assoc);
 
             $assign($key, $value);
         }
@@ -128,13 +143,13 @@ class Decoder
      * @return array
      * @throws UndecodeableException
      */
-    private function decodeArray($string, $assoc)
+    private static function decodeArray($string, $assoc)
     {
         // Start empty.
         $arr = [];
 
         // Get some information on the first byte.
-        list($firstHex, $firstOctal) = $this->analyzeFirstChar($string[0]);
+        list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         if ($firstOctal === '9') {
             // fixarray 1000xxxx
@@ -155,7 +170,7 @@ class Decoder
 
         // Loop to decode every item of the array.
         for ($i = 0; $i < $size; $i++) {
-            list($item, $string) = $this->decodeRecursive($string, $assoc);
+            list($item, $string) = self::decodeRecursive($string, $assoc);
             $arr[] = $item;
         }
 
@@ -168,10 +183,10 @@ class Decoder
      *
      * @return array
      */
-    private function decodeInt($string)
+    private static function decodeInt($string)
     {
         // Get info on the first char.
-        list($firstHex, $firstOctal) = $this->analyzeFirstChar($string[0]);
+        list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         if (hexdec($firstHex) < pow(2, 7)) {
             // fixint 0xxxxxxx
@@ -213,10 +228,10 @@ class Decoder
      *
      * @return array
      */
-    private function decodeString($string)
+    private static function decodeString($string)
     {
         // Get some information on the first character.
-        list($firstHex, $firstOctal) = $this->analyzeFirstChar($string[0]);
+        list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         if (in_array(hexdec($firstOctal), [10, 11])) {
             // fixstr
@@ -250,7 +265,7 @@ class Decoder
      *
      * @return array
      */
-    private function analyzeFirstChar($char)
+    private static function analyzeFirstChar($char)
     {
         $firstHex   = unpack('H*', $char)[1];
         $firstOctal = substr($firstHex, 0, 1);
