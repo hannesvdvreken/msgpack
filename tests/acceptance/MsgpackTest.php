@@ -1,5 +1,6 @@
 <?php
 
+use Msgpack\Decoder;
 use Msgpack\Encoder;
 
 class MsgpackTest extends PHPUnit_Framework_TestCase
@@ -10,6 +11,11 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
     protected $encoder;
 
     /**
+     * @var Decoder
+     */
+    protected $decoder;
+
+    /**
      * @param null   $name
      * @param array  $data
      * @param string $dataName
@@ -17,6 +23,7 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
     public function __construct($name = null, array $data = array(), $dataName = '')
     {
         $this->encoder = new Encoder();
+        $this->decoder = new Decoder();
         parent::__construct($name, $data, $dataName);
     }
 
@@ -31,6 +38,26 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
         $expected = msgpack_pack($input);
 
         $this->assertEquals($result, $expected);
+    }
+
+    /**
+     * Test the usage of both the static method as the non-static method.
+     *
+     * @test
+     */
+    public function testIsBothCallableStaticAndNonStatic()
+    {
+        $input = ['foo' => 'bar', 'baz'];
+
+        $result1 = $this->encoder->encode($input);
+        $result2 = Encoder::encode($input);
+
+        $this->assertEquals($result1, $result2);
+
+        $result1 = $this->decoder->decode($result1);
+        $result2 = Decoder::decode($result2);
+
+        $this->assertEquals($result1, $result2);
     }
 
     /**
