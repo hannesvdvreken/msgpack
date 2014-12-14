@@ -1,6 +1,7 @@
 <?php
 namespace Msgpack;
 
+use BadMethodCallException;
 use stdClass;
 
 class Decoder
@@ -14,7 +15,7 @@ class Decoder
     public function __call($name, $arguments)
     {
         if ($name != 'decode') {
-            throw new \BadMethodCallException;
+            throw new BadMethodCallException();
         }
 
         return self::decode($arguments[0], $arguments[1]);
@@ -39,7 +40,7 @@ class Decoder
      * @return array
      * @throws UndecodeableException
      */
-    public function decodeRecursive($string, $assoc = false)
+    public static function decodeRecursive($string, $assoc = false)
     {
         list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 

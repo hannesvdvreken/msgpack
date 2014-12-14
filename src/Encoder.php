@@ -1,6 +1,8 @@
 <?php
 namespace Msgpack;
 
+use BadMethodCallException;
+
 class Encoder
 {
     /**
@@ -12,7 +14,7 @@ class Encoder
     public function __call($name, $arguments)
     {
         if ($name != 'encode') {
-            throw new \BadMethodCallException;
+            throw new BadMethodCallException();
         }
 
         return self::encode($arguments[0]);
