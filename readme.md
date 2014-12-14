@@ -47,7 +47,7 @@ Some messages or encoded string throw exceptions because Msgpack has its limitat
 
 ## Testing
 
-Run test with `composer test`.
+Run tests with `composer test`.
 
 ## Other packages
 
