@@ -207,7 +207,7 @@ class Encoder
             } elseif ($integer < pow(2, 32)) {
                 // uint 32: 32-bit big-endian unsigned integer
                 // 0xce ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dd(dechex(0xce00000000 + $integer)));
+                return pack('H*', dechex(0xce00000000 + $integer));
             } elseif ($integer < pow(2, 64)) {
                 // uint 64: 64-bit big-endian unsigned integer
                 // 0xcf ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
