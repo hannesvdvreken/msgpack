@@ -14,6 +14,9 @@
   "require-dev": {
     "phpunit/phpunit": "~4.4"
   },
+  "suggest": {
+    "ext-msgpack": "Allows encoding and decoding with greater speed"
+  },
   "autoload": {
     "psr-4": {
       "Msgpack\\": "src"
