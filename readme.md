@@ -17,32 +17,42 @@ For more information on Msgpack: [msgpack.org](http://msgpack.org/)
 
 ## Usage
 
-There are 2 main classes with basic static methods to use:
+There are 2 main classes with each a single method to use:
 
 ```php
-    $encoder = new Msgpack\Encoder;
-    $string = $encoder->encode($data);
+$encoder = new Msgpack\Encoder();
+$string = $encoder->encode($data);
 
-    $decoder = new Msgpack\Decoder;
-    $data = $decoder->decode($string);
+$decoder = new Msgpack\Decoder();
+$data = $decoder->decode($string);
 ```
+
+Or if you prefer, you can also call the static methods with the exact same interface:
+
+```php
+$string = Msgpack\Encoder::encode($data);
+
+$decoder = Msgpack\Decoder::decode($string);
+```
+
+This is to allow you to inject the encoder and decoder into your classes so you can mock them out.
 
 Some messages or encoded string throw exceptions because Msgpack has its limitations:
 
 ```php
-    try {
-        $string = $encoder->encode($data);
-    } catch (Msgpack\UnencodeableException $unencex) {
-        //
-    }
+try {
+    $string = $encoder->encode($data);
+} catch (Msgpack\UnencodeableException $unencex) {
+    //
+}
 ```
 
 ```php
-    try {
-        $string = $decoder->decode($string);
-    } catch (Msgpack\UndecodeableException $undecex) {
-        //
-    }
+try {
+    $string = $decoder->decode($string);
+} catch (Msgpack\UndecodeableException $undecex) {
+    //
+}
 ```
 
 ## Testing
