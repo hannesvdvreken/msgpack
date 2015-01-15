@@ -30,7 +30,8 @@ class Decoder
      */
     public static function decode($string, $assoc = true)
     {
-        return self::decodeRecursive($string, $assoc)[0];
+        $result = self::decodeRecursive($string, $assoc);
+        return $result[0];
     }
 
     /**
@@ -64,17 +65,17 @@ class Decoder
             case $firstHex === 'd2': // int 32
             case $firstHex === 'd3': // int 64
                 return self::decodeInt($string);
-            case in_array(hexdec($firstOctal), [10, 11]): // fixstr 101xxxxx
+            case in_array(hexdec($firstOctal), array(10, 11)): // fixstr 101xxxxx
             case $firstHex === 'd9': // str 8
             case $firstHex === 'da': // str 16
             case $firstHex === 'db': // str 32
                 return self::decodeString($string);
             case $firstHex === 'c2': // false
-                return [false, substr($string, 1)];
+                return array(false, substr($string, 1));
             case $firstHex === 'c3': // true
-                return [true, substr($string, 1)];
+                return array(true, substr($string, 1));
             case $firstHex === 'c0': // nil
-                return [null, substr($string, 1)];
+                return array(null, substr($string, 1));
             default:
                 throw new UndecodeableException($firstHex . ' is not a valid identifier for a type.', 1);
         }
@@ -112,7 +113,7 @@ class Decoder
 
         // Differentiate between an associative array and an object.
         if ($assoc) {
-            $data = [];
+            $data = array();
             $assign = function ($key, $value) use (&$data) {
                 $data[$key] = $value;
             };
@@ -132,7 +133,7 @@ class Decoder
         }
 
         // Return the result.
-        return [$data, $string];
+        return array($data, $string);
     }
 
     /**
@@ -145,7 +146,7 @@ class Decoder
     private static function decodeArray($string, $assoc)
     {
         // Start empty.
-        $arr = [];
+        $arr = array();
         $size = 0;
         $offset = 1;
 
@@ -176,7 +177,7 @@ class Decoder
         }
 
         // Return the decoded data and the resulting string.
-        return [$arr, $string];
+        return array($arr, $string);
     }
 
     /**
@@ -192,7 +193,7 @@ class Decoder
         if (hexdec($firstHex) < pow(2, 7)) {
             // fixint 0xxxxxxx
             $int = hexdec($firstHex);
-            return [$int, substr($string, 1)];
+            return array($int, substr($string, 1));
         } elseif (hexdec($firstOctal) > 13) {
             // negative fixint 111xxxxx
             // TODO
@@ -221,7 +222,7 @@ class Decoder
             // int 64
             // TODO
         }
-        return [0, substr($string, 1)];
+        return array(0, substr($string, 1));
     }
 
     /**
@@ -237,7 +238,7 @@ class Decoder
         // Get some information on the first character.
         list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
-        if (in_array(hexdec($firstOctal), [10, 11])) {
+        if (in_array(hexdec($firstOctal), array(10, 11))) {
             // fixstr
             $size   = hexdec($firstHex) - bindec('10100000');
             $offset = 1;
@@ -261,7 +262,7 @@ class Decoder
         $string = substr($string, $size);
 
         // Return
-        return [$data, $string];
+        return array($data, $string);
     }
 
     /**
@@ -271,9 +272,9 @@ class Decoder
      */
     private static function analyzeFirstChar($char)
     {
-        $firstHex   = unpack('H*', $char)[1];
+        list(, $firstHex) = unpack('H*', $char);
         $firstOctal = substr($firstHex, 0, 1);
 
-        return [$firstHex, $firstOctal];
+        return array($firstHex, $firstOctal);
     }
 }

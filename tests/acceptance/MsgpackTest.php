@@ -47,7 +47,7 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
      */
     public function testIsBothCallableStaticAndNonStatic()
     {
-        $input = ['foo' => 'bar', 'baz'];
+        $input = array('foo' => 'bar', 'baz');
 
         $result1 = $this->encoder->encode($input);
         $result2 = Encoder::encode($input);
@@ -65,7 +65,7 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
      */
     public function provideMsgpackData()
     {
-        $arr = [];
+        $arr = array();
 
         // Strings.
         $arr[] = '';
@@ -91,15 +91,15 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
         //$arr[] = -1000000;
 
         // Arrays.
-        $arr[] = [];
-        $arr[] = ['foo', 'bar', 'baz'];
+        $arr[] = array();
+        $arr[] = array('foo', 'bar', 'baz');
         $arr[] = array_merge(range('a', 'z'), range('A', 'Z'));
 
         // Associative arrays.
-        $arr[] = ['foo' => 'bar'];
-        $arr[] = ['foo' => ['bar' => 'baz']];
-        $arr[] = ['foo' => ['bar' => ['baz' => 'qux']]];
-        $arr[] = [['bar' => 'bar'], ['baz' => 'qux']];
+        $arr[] = array('foo' => 'bar');
+        $arr[] = array('foo' => array('bar' => 'baz'));
+        $arr[] = array('foo' => array('bar' => array('baz' => 'qux')));
+        $arr[] = array(array('bar' => 'bar'), array('baz' => 'qux'));
 
         // Objects.
         //$obj = new stdClass();
@@ -113,7 +113,7 @@ class MsgpackTest extends PHPUnit_Framework_TestCase
         //$arr[] = $obj;
 
         return array_map(function ($item) {
-            return [null => $item];
+            return array(null => $item);
         }, $arr);
     }
 }
