@@ -183,55 +183,31 @@ class Encoder
      */
     private static function encodeInteger($integer)
     {
-        if ($integer >= 0) {
-            // All positive integers.
-            if ($integer < pow(2, 7)) {
-                // positive fixnum: 7-bit positive integer
-                // 0XXXXXXX
-                return pack('H*', str_pad(dechex($integer), 2, 0, STR_PAD_LEFT));
-            } elseif ($integer < pow(2, 8)) {
-                // uint 8: 8-bit unsigned integer
-                // 0xcc ZZZZZZZZ
-                return pack('H*', dechex(0xcc00 + $integer));
-            } elseif ($integer < pow(2, 16)) {
-                // uint 16: 16-bit big-endian unsigned integer
-                // 0xcd ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xcd0000 + $integer));
-            } elseif ($integer < pow(2, 32)) {
-                // uint 32: 32-bit big-endian unsigned integer
-                // 0xce ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xce00000000 + $integer));
-            } elseif ($integer < pow(2, 64)) {
-                // uint 64: 64-bit big-endian unsigned integer
-                // 0xcf ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xcf) . str_pad(dechex($integer), 16, '0', STR_PAD_LEFT));
-            }
-        } else {
-            // Negative integers.
-            $integer = abs($integer);
+        if ($integer >= 0 && $integer < pow(2, 7)) {
+            // positive fixnum: 7-bit positive integer
+            // 0XXXXXXX
+            return pack('H*', str_pad(dechex($integer), 2, 0, STR_PAD_LEFT));
+        } elseif ($integer < 0 && abs($integer) < pow(2, 5)) {
+            // negative fixnum: 5-bit negative integer
+            // 111YYYYY
+            return pack('H*', dechex(bindec(11100000) + $integer));
+        }
 
-            if ($integer < pow(2, 5)) {
-                // negative fixnum: 5-bit negative integer
-                // 111YYYYY
-                return pack('H*', dechex(bindec(11100000) + $integer));
-            } elseif ($integer < pow(2, 8)) {
-                // int 8: 8-bit signed integer
-                // 0xd0 ZZZZZZZZ
-                return pack('H*', dechex(0xd000 + $integer));
-            } elseif ($integer < pow(2, 16)) {
-                // int 16: 16-bit big-endian signed integer
-                // 0xd1 ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xd10000 + $integer));
-            } elseif ($integer < pow(2, 32)) {
-                // int 32: 32-bit big-endian signed integer
-                // 0xd2 ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xd200000000 + $integer));
-            } elseif ($integer < pow(2, 64)) {
-                // int 64: 64-bit big-endian signed integer
-                // 0xd3 ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
-                return pack('H*', dechex(0xd3) . str_pad(dechex($integer), 16, '0', STR_PAD_LEFT));
+        if ($integer >= 0) {
+            $prefixes = array(8 => 0xcc00, 16 => 0xcd0000, 32 => 0xce00000000, 64 => 0xcf);
+        } else {
+            $prefixes = array(8 => 0xd000, 16 => 0xd10000, 32 => 0xd200000000, 64 => 0xd3);
+        }
+
+        // For each step the max size increases.
+        foreach (array(8, 16, 32) as $power) {
+            if ($integer < pow(2, $power)) {
+                return pack('H*', dechex($prefixes[$power] + $integer));
             }
         }
+
+        // 0x** ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ ZZZZZZZZ
+        return pack('H*', dechex($prefixes[64]).str_pad(dechex($integer), 16, '0', STR_PAD_LEFT));
     }
 
     /**
