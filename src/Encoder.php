@@ -32,25 +32,18 @@ class Encoder
         switch (gettype($data)) {
             case 'array':
                 return self::encodeArray($data);
-                break;
             case 'object':
                 return self::encodeObject($data);
-                break;
             case 'string':
                 return self::encodeString($data);
-                break;
             case 'integer':
                 return self::encodeInteger($data);
-                break;
             case 'boolean':
                 return self::encodeBoolean($data);
-                break;
             case 'double':
                 return self::encodeDouble($data);
-                break;
             case 'NULL':
                 return self::encodeNull($data);
-                break;
             case 'resource':
                 // TODO
                 break;

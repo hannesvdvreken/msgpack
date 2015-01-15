@@ -49,12 +49,10 @@ class Decoder
             case $firstHex === 'de': // map 16
             case $firstHex === 'df': // map 32
                 return self::decodeMap($string, $assoc);
-                break;
             case $firstOctal === '9': // fixarray 1001xxxx
             case $firstHex === 'dc': // array 16
             case $firstHex === 'dd': // array 32
                 return self::decodeArray($string, $assoc);
-                break;
             case hexdec($firstHex) < pow(2, 7): // fixint 0xxxxxxx
             case hexdec($firstOctal) > 13: // negative fixint 111xxxxx
             case $firstHex === 'cc': // uint 8
@@ -66,13 +64,11 @@ class Decoder
             case $firstHex === 'd2': // int 32
             case $firstHex === 'd3': // int 64
                 return self::decodeInt($string);
-                break;
             case in_array(hexdec($firstOctal), [10, 11]): // fixstr 101xxxxx
             case $firstHex === 'd9': // str 8
             case $firstHex === 'da': // str 16
             case $firstHex === 'db': // str 32
                 return self::decodeString($string);
-                break;
             case $firstHex === 'c2': // false
                 return [false, substr($string, 1)];
             case $firstHex === 'c3': // true
@@ -93,12 +89,13 @@ class Decoder
      */
     private static function decodeMap($string, $assoc)
     {
+        $size = 0;
+        $offset = 1;
         list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
 
         if ($firstOctal === '8') {
             // fixmap 1000xxxx
             $size = hexdec($firstHex) - bindec('10000000');
-            $offset = 1;
         } elseif ($firstHex === 'de') {
             // map 16
             $size = hexdec(unpack('H*', substr($string, 1, 2)));
@@ -148,6 +145,8 @@ class Decoder
     {
         // Start empty.
         $arr = [];
+        $size = 0;
+        $offset = 1;
 
         // Get some information on the first byte.
         list($firstHex, $firstOctal) = self::analyzeFirstChar($string[0]);
@@ -155,14 +154,13 @@ class Decoder
         if ($firstOctal === '9') {
             // fixarray 1000xxxx
             $size   = hexdec(substr($firstHex, 1));
-            $offset = 1;
         } elseif ($firstHex === 'dc') {
             // arrar 16
             $size   = hexdec(unpack('H*', substr($string, 1, 2)));
             $offset = 3;
         } elseif ($firstHex === 'dd') {
             // array 32
-            hexdec(unpack('H*', substr($string, 1, 4)));
+            $size = hexdec(unpack('H*', substr($string, 1, 4)));
             $offset = 5;
         }
 
