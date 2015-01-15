@@ -8,6 +8,7 @@ php:
 
 before_script:
   - pecl install -f msgpack
+  - echo "extension=msgpack.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction --dev
 
